@@ -1,0 +1,16 @@
+how to manually initial setup on aws test system to Adapt the system settings for a new system created from existing system image, or Teamcenter specific configuration adaptation.
+Here are the general steps for manually setting up an AWS test system to adapt the system settings for a new system created from an existing system image or Teamcenter specific configuration adaptation:
+
+Launch an AWS EC2 instance and connect to it using SSH.
+
+Determine the required system settings to be adapted, such as proxy settings, no proxy settings, hosts file configuration, bashrc file configuration, SSL certificates, etc.
+
+Check the existing system settings on the old system or the configured system.
+
+Copy the required system settings from the old system or the configured system to the new AWS test system. This can be done using various methods such as SCP or SFTP.
+
+Configure the system settings on the new AWS test system to match the copied settings. This may involve editing configuration files like /etc/environment, /etc/hosts, ~/.bashrc, etc., and setting environment variables.
+
+Verify that the system settings have been adapted correctly by checking that the required services are functioning as expected.
+
+Test the system thoroughly to ensure that it is behaving correctly and that there are no unexpected issues due to the adapted system settings.
