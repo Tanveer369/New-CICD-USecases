@@ -14,3 +14,13 @@ Configure the system settings on the new AWS test system to match the copied set
 Verify that the system settings have been adapted correctly by checking that the required services are functioning as expected.
 
 Test the system thoroughly to ensure that it is behaving correctly and that there are no unexpected issues due to the adapted system settings.
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ OUTPUT @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+An AWS EC2 instance launched with the desired specifications and settings.
+The copied system settings from the old system or the configured system successfully transferred to the new system.
+The system settings on the new system updated and configured correctly to match the copied settings.
+The required services and applications tested and verified to be functioning correctly on the new system.
+Any unexpected issues or errors resolved and the new system functioning as expected.
+Documentation or notes detailing the steps taken during the setup process, which may be useful for future reference or troubleshooting.
