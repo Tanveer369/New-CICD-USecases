@@ -1,0 +1,68 @@
+Use case definition
+When a new system is provisioned, there is a set of configuration that has to be performed to bring the system into the landscape.
+This use-case aims to configure an AWS Cloud system with the required software & configurations, system configurations, certificates etc.
+
+User Role(s)
+ARPLA User
+
+Complexity
+Medium
+
+Technical Modules/Components
+Ansible
+Jenkins
+GIT
+
+Input
+Machine hostname(s) or IP address(es) to perform the changes.
+Output
+Updated machine with required software and configuration.
+As an additional output, a report is generated with the results of the configuration and installation changes.
+Steps
+User actions:
+
+There is a base-configuration template available in the CI/CD source repository that holds a base-configuration required on the target machines.
+If required, this template has to be adjusted for new changes.
+System actions:
+
+PARALLEL STEP Adapt and update system configuration (these configurations are available as base-configurations in a repository, the system will adapt the configurations on the machine to match the base-configurations):
+bashrc
+Adapt the script to include all necessary invocations.
+Export required environment variables.
+pass
+Validate the installation. If not installed, pass needs to be installed first.
+The required entries need to be entered once the software is available.
+System aliases
+Add/modify the required system aliases.
+hosts file Configuration
+Add the hosts entries into the hosts file.
+PARALLEL STEP Create and place certificates:
+For freshly provisioned systems, system certificates have to be generated.
+Generate the certificates locally, and then upload the certificate signing request on the BMW CLCM portal:
+https://clcm.bmwgroup.net/
+After the signed certificates are available, they need to be placed on a specified location on the system.
+PARALLEL STEP Install required 3rd party software on the system:
+Java
+Python
+...
+Generate a report of the executions for the end-user.
+The report should clearly state all the executions/adaptations/installations performed on the machine, and their status.
+Example:
+------------------------------------------------------------
+Execution finished
+------------------------------------------------------------
+Total: 11,    success: 8,     skipped: 2,   failed: 1
+Technical Specification
+(Prerequisites: Install the Git and Ansible plugins in Jenkins.)
+
+Create an Ansible playbook to deploy new/updated configuration on target systems.
+bashrc
+pass
+system aliases
+hostfile configuration
+Certificates
+Required 3rd party software: Java, Python etc.
+Each installation should also include a "validate" step to make sure that the software is installed properly.
+Create a Jenkins job to integrate the Ansible playbook. CI/CD end-user will only use the Jenkins job and not the Ansible playbook directly.
+The Jenkins job should check out the Git repository containing the system configuration and any application code.
+The updated configuration needs to be applied on the target machines by invoking the Ansible playbook.
