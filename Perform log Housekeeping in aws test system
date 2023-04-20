@@ -1,0 +1,48 @@
+Use Case Definition:
+
+Automate Log Housekeeping Activities on the AWS Test System using Jenkins and Ansible
+
+Technical Modules/Components:
+
+  Ansible
+  Jenkins
+  Git
+
+
+Input:
+
+  Machine hostname(s) or IP address(es) of the AWS Test System
+  AWS Test System credentials (access key, secret key, and region)
+  Log retention period (number of days to retain logs)
+  Target AWS services for log housekeeping (e.g., CloudWatch, S3, etc.)
+
+
+Output:
+
+  Updated AWS Test System with log housekeeping activities completed
+  Summary report of logs deleted, retained, and errors (if any)
+
+
+Steps:
+
+User actions:
+
+  Create or update an Ansible playbook for log housekeeping activities, specifying the AWS Test System credentials, log retention settings, and target AWS services. Store the playbook in a Git repository.
+  Configure a Jenkins job to integrate with the Ansible playbook and Git repository.
+
+
+System actions:
+
+  PARALLEL STEP: Execute the Jenkins job to check out the Git repository containing the Ansible playbook for log housekeeping activities.
+  PARALLEL STEP: Authenticate and establish a connection with the AWS Test System using the provided credentials.
+  Invoke the Ansible playbook to automate log housekeeping on the AWS Test System by identifying and deleting logs older than the defined retention period from the specified AWS services.
+  Monitor the Ansible playbook execution, handling any errors and generating a summary report of logs deleted, retained, and errors (if any).
+
+
+Technical Specification:
+
+  Install the Git and Ansible plugins in Jenkins, if not already installed.
+  Create an Ansible playbook to perform log housekeeping activities on the AWS Test System. The playbook should include tasks to authenticate with the AWS Test System, configure log retention settings, and delete logs older than the defined retention period for the specified AWS services.
+  Create a Jenkins job to integrate the Ansible playbook. The Jenkins job should check out the Git repository containing the Ansible playbook and execute it on the specified AWS Test System.
+  Configure any necessary build triggers (e.g., cron job) for the Jenkins job to automate log housekeeping activities.
+  Ensure that the Jenkins job generates a summary report of logs deleted, retained, and errors (if any) upon completion.
