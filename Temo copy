@@ -1,121 +1,106 @@
 Use case definition
 
-User wants to update the SSL/TLS certificates on AWS test systems to ensure that the system is secure and accessible with HTTPS or other secure protocols.
+User wishes to provision a new AWS system based on an AWS OOTB AMI.
+This use-case is applicable when a pre-existing system image (AMI) for a BMW system, or an image with required Teamcenter installation is not available.
 
 User Role(s)
 
 ARPLA User
 
-Complexity
+Technical Complexity
 
 Medium
 
 Technical Modules/Components
-OpenSSL
-Ansible - This module would provide the ability to automate the deployment of the new SSL/TLS certificate to the system.
-Jenkins - This module provides the ability to automate the entire update process.
-GIT
+
+Jenkins
+
+AWS Terraform/Code Build
+
+AWS CLI/SDK
+
 Python
-Hashicorp Vault
+
 Input
-Hostname for which certificate is to be generated.
+Environment selection to provision the image in (e.g. INTEG/Test etc.)
+Selection of AWS base image (AMI) to be used to provision the new system
+An override parameter that decides the behavior of the use-case:
+Dry-run:
+This is the default behavior of the use-case. 
+
+In dry run mode, the system plans the execution of resource changes, but instead of actually executing them, it shows users what changes would be made if the plan were applied. This can be useful in several scenarios, such as:
+
+Previewing the changes: Users can use the dry run mode to preview the changes that will be made to the infrastructure before actually applying them. This allows them to verify that the changes are correct and to identify any potential issues that might arise.
+
+Testing changes: The dry run mode can be used to test changes to the Terraform configuration without actually making any changes to the infrastructure. This can help users identify any potential issues or errors that might arise before making any actual changes.
+
+Preventing unintended changes: The dry run mode can be used as a safety check to prevent unintended changes to the infrastructure. By running a dry run before applying any changes, users can ensure that the changes will only affect the resources they intend to modify.
+
+Actual execution:
+The execute mode, the system would actually perform the changes in the AWS landscape, i.e. provision the system.
 Output
-New certificate generated for the specified host.
-Certificate placed on the system at specified location.
+A newly provisioned system hosted in AWS EC2
+As an additional output, a validation report with results of the provisioning and smoke tests is also generated.
 Steps
 
 User actions:
 
-User selects the hostname for which the certificate needs to be generated/updated.
+User selects the environment in which the new system is to be provisioned.
+User chooses a new system image (AMI) to be used to provision the new system.
+
+Alternatively, this information could also be sent as parameters to the job, for example, when this job is being triggered by a parent job pipeline.
+In that case, these would not be user-actions anymore.
+
+
+
 
 System actions:
 
- Run the automated certificate generation script to generate the certificate signing request (CSR) for the AWS test system.
+ System runs an automated logic to identify a valid name for the machine to be provisioned.
+This is done by checking the applicable range of numbers, and checking appropriate name prefix according the environment selection (set in configuration).
+Example: ltawsteg110
+
+
+The next number for the machine can be identified by incrementing the numeric suffix portion of the last available machine name (e.g. ltawsteg110+1 = ltawsteg111)
+ Run the automated script to provision the system. The name of the new system would be passed as a parameter to the script.
+
+Dry run:
+The script is first executed in a "dry-run" mode to verify the provisioning.
 
 User action:
 
-Upload the certificate to BMW CLCM portal for signing the certificate signing request.
-The certificate will be signed and sent back to the user.
+User needs to validate the results of the dry-run and then re-execute the job again with an override parameter to actually perform changes.
 
 
 
 
+Actual execution:
+The system will run the script to provision the system.
 
 
-User action:
-
-Place the signed certificate (CRT) on the AWS system.
-
-
-
-
-
-
- Validate the updated SSL certificate.
-
-Expiry date of the new certificate
-
-$: openssl x509 -enddate -noout -in ltawsteg362.gi-dev.eu-central-1.aws.cloud.bmw.crt
-
-Output:
-notAfter=Mar 20 13:38:16 2024 GMT
-
-b. Subject of the new certificate
-
-$: openssl x509 -subject -noout -in ltawsteg362.gi-dev.eu-central-1.aws.cloud.bmw.crt
-
-Output:
-subject=C = DE, ST = Bavaria, L = Munich, O = Bayerische Motoren Werke AG, OU = PKI Services, CN = ltawsteg362.gi-dev.eu-central-1.aws.cloud.bmw, emailAddress = tcplm@bmw.com
-
-c. Validate HTTPS access to the system.
-
-
-
-
-
-
-
- Upload the certificate to Hashicorp Vault.
+Validate the newly provision AWS system - the system will validate the success of the scenario by checking the following points:
+Check the status and exit code of the automated script.
+Validate the availability of the new host:
+Once the new system is provisioned successfully, it should be reachable within the network.
+A ping could be performed to the system to validate the availability of the system.
 Technical Specification
-Create and test a local certificate generation Python script.
-Input:
-hostname
-Certificate parameters:
-subject=C = DE, ST = Bavaria, L = Munich, O = Bayerische Motoren Werke AG, OU = PKI Services, CN = <>, emailAddress = <>
+Create a Python script implementing the AWS SDK to automatically identify the machine name to be created.
 
-
-Output:
-Generated CSR file
-Description:
-This script will generate a certificate signing request by using openssl locally on the system.
-Create a Python script to automate CLCM portal interactions using API calls.
-Input:
-CSR file
-CLCM API parameters
-subject=C = DE, ST = Bavaria, L = Munich, O = Bayerische Motoren Werke AG, OU = PKI Services, CN = <>, emailAddress = <>
-Output:
-Generated BMW signed CRT file
-Description:
-This script will automate the process of requesting a signed certificate from a Certificate signing request.
-Create an Ansible playbook to validate the certificate and place it on the system.
-Input:
-CRT file
-hostname to place the certificate
-Location to place the certificate
-Output:
-Certificate is copied to the specified locaiton on the machine
-Certificate is validated on the machine
-Description:
-This Ansible playbook will copy the signed certificate to the specified location on the machine, and perform smoke tests on the certificate file to validate if it's okay.
-Create a Jenkins job to integrate the Python scripts and Ansible scripts.
-Input:
-Hostname
-Output:
-Certificate is generated
-Certificate is signed using the CLCM portal
-Certificate is copied to the specified locaiton on the machine
-Certificate is validated on the machine
-Certificate is uplaoded to Hashicorp Vault.
-Description:
-This Jenkins job integrates all the required scripts to generate the certificate, place it on the machine and validate it.
-This job will also upload the final certificate to Hashicorp Vault.
+Script inputs:
+environment selection
+range of numeric suffix values for the selected environment (part of job configuration)
+Script output:
+Name of the system to be provisioned.
+Create a Jenkins Job to integrate the Python scripts, and Terraform scripts, and execute them in correct sequence.
+Job input:
+Execution mode (dry run/actual execution)
+Environment selection
+AWS AMI Selection
+Job Output:
+The job should provide the following expected outputs according to the execution mode:
+"Dry Run": the results of the dry run and a summary for the end-user to validate.
+"Actual Execution": a newly provisioned system in the AWS landscape.
+Job Description:
+This Jenkins job acts as a wrapper to execute the above designed Python script and to execute the script to provision the system.
+The AWS "system" is actually provisioned with a Terraform script which is parameterized to accept the AWS AMI ID as well as the hostname as parameters.
+This Terraform script is also executed by the Jenkins job, acting as a wrapper and monitoring the output form Terraform.
