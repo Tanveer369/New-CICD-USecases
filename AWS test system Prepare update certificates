@@ -1,1 +1,60 @@
+Usecase: User wants to prepare update certificate on the aws test system.
 
+Technical module
+AWS CLI
+AWS certificate manager
+Ansible
+Jenkins
+GIt
+Python
+AWS IAM
+
+Prequisities:
+Aws Infrastrure is already created.
+
+
+Input:
+Environment selection to update the ssl certificate.
+Selection of aws test system to update ssl certificate.
+
+Output:
+Update aws test system with ssl certificate.
+
+STeps
+
+User action:
+User select the environment in which certificate need to be update.
+user need to identify on aws system certificate neeto to be update or assign.
+Create an IAM user with appropriate permissions and generate an IAM access key and secret key for authentication with AWS.
+
+System action:
+Key step: Runs the automated configuration management script to create or update 
+the certificate to the aws test system.
+	Configuration management tool uses the provided IAM access key and secret key to authenticate with AWS and import the SSL certificate to Certificate Manager.
+	
+Validate the newly assigned or updated certificate to the aws test system.
+Store the SSL certificate file and key file in HashiCorp Vault.
+
+
+Technical specification:
+
+Create an Ansible playbook that performs the following steps:
+a. Authenticates with HashiCorp Vault using the provided URL and token and retrieves the SSL certificate file and key file.
+b. Imports the SSL certificate to AWS Certificate Manager.
+c. Creates a new version of the SSL certificate on the certificate manager and extracts the certificate's ARN.
+d. Updates the Elastic Load Balancer's SSL certificate with the new version.
+
+Create a Jenkins job to trigger the Ansible playbook, passing the required inputs as parameters. In the job configuration, provide the following parameters:
+
+HashiCorp Vault URL
+HashiCorp Vault token
+AWS Region name
+Elastic Load Balancer name
+IAM Access Key
+IAM Secret Key
+
+Execute the Ansible playbook via the Jenkins job to update the SSL certificate on the Elastic Load Balancer in AWS.
+
+Verify that the SSL certificate has been updated on the Elastic Load Balancer by checking the SSL certificate details on the Elastic Load Balancer in the AWS console.
+
+Store the SSL certificate file and key file in HashiCorp Vault
